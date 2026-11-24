@@ -5,15 +5,21 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { fetchPostById } from '@/api/posts';
+import { findCachedPost } from '@/cache/feedCache';
 import { AppText } from '@/components/AppText';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ListStates';
+import { OfflineBanner } from '@/components/OfflineBanner';
 import { TypeBadge } from '@/components/TypeBadge';
 import { colors, spacing } from '@/constants/theme';
 import type { Post } from '@/types/post';
 import { formatPrice, formatTimeAgo } from '@/utils/format';
 
 type DetailState =
-  { status: 'loading' } | { status: 'notFound' } | { status: 'error' } | { status: 'ready'; post: Post };
+  | { status: 'loading' }
+  | { status: 'notFound' }
+  | { status: 'error' }
+  // isOffline: the network failed and this is the copy saved with the feed.
+  | { status: 'ready'; post: Post; isOffline: boolean };
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,9 +36,10 @@ export default function PostDetailScreen() {
     async function load() {
       try {
         const post = await fetchPostById(id);
-        if (!cancelled) setState(post ? { status: 'ready', post } : { status: 'notFound' });
+        if (!cancelled) setState(post ? { status: 'ready', post, isOffline: false } : { status: 'notFound' });
       } catch {
-        if (!cancelled) setState({ status: 'error' });
+        const saved = await findCachedPost(id);
+        if (!cancelled) setState(saved ? { status: 'ready', post: saved, isOffline: true } : { status: 'error' });
       }
     }
     load();
@@ -52,9 +59,10 @@ export default function PostDetailScreen() {
   if (state.status === 'error')
     return <ErrorState title={t('detail.errorTitle')} hint={t('feed.errorHint')} onRetry={retry} />;
 
-  const { post } = state;
+  const { post, isOffline } = state;
   return (
     <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}>
+      {isOffline ? <OfflineBanner title={t('offline.title')} message={t('offline.detailMessage')} /> : null}
       {post.imageUrl ? (
         <Image
           source={{ uri: post.imageUrl }}

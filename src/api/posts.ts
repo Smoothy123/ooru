@@ -7,6 +7,17 @@ import type { FeedCursor, FeedFilter, FeedPage, NewClassified, PickedPhoto, Post
 export const PAGE_SIZE = 10;
 const IMAGE_BUCKET = 'post-images';
 
+// React Native's fetch never gives up on its own. Without a timeout, a phone on
+// Wi-Fi with no internet would show a spinner forever instead of falling back
+// to the offline cache. (Uploads get no timeout: big photos on 3G can be slow.)
+const READ_TIMEOUT_MS = 10_000;
+
+function timeoutSignal(ms: number): AbortSignal {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
 const POST_COLUMNS = 'id, type, district, title, body, price, image_url, author_name, created_at';
 
 /** A row exactly as Postgres stores it (snake_case). */
@@ -72,7 +83,8 @@ export async function fetchPosts({ district, filter, cursor = null }: FetchPosts
     .order('created_at', { ascending: false })
     .order('id', { ascending: false })
     // Ask for one extra row: if it comes back, there is another page.
-    .limit(PAGE_SIZE + 1);
+    .limit(PAGE_SIZE + 1)
+    .abortSignal(timeoutSignal(READ_TIMEOUT_MS));
 
   if (error) throw new Error(error.message);
 
@@ -90,7 +102,12 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 export async function fetchPostById(id: string): Promise<Post | null> {
   if (!UUID_PATTERN.test(id)) return null;
 
-  const { data, error } = await supabase.from('posts').select(POST_COLUMNS).eq('id', id).maybeSingle();
+  const { data, error } = await supabase
+    .from('posts')
+    .select(POST_COLUMNS)
+    .eq('id', id)
+    .abortSignal(timeoutSignal(READ_TIMEOUT_MS))
+    .maybeSingle();
 
   if (error) throw new Error(error.message);
   return data ? toPost(data as PostRow) : null;

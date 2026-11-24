@@ -1,11 +1,13 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ErrorState } from '@/components/ListStates';
 import { TELUGU_FONT, TELUGU_FONT_FILES } from '@/constants/fonts';
 import { colors } from '@/constants/theme';
 import { DistrictProvider } from '@/context/DistrictContext';
@@ -52,5 +54,18 @@ export default function RootLayout() {
         <Stack.Screen name="create" options={{ title: t('create.title'), presentation: 'modal' }} />
       </Stack>
     </DistrictProvider>
+  );
+}
+
+/**
+ * Expo Router shows this instead of a crash if any screen throws while rendering.
+ * "Try again" re-renders the screen.
+ */
+export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+  const { t } = useTranslation();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <ErrorState title={t('common.crashTitle')} hint={t('common.crashHint')} onRetry={retry} />
+    </View>
   );
 }

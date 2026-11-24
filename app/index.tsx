@@ -9,11 +9,13 @@ import { AppText } from '@/components/AppText';
 import { DistrictPicker } from '@/components/DistrictPicker';
 import { FilterTabs } from '@/components/FilterTabs';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ListStates';
+import { OfflineBanner } from '@/components/OfflineBanner';
 import { PostCard } from '@/components/PostCard';
 import { colors, radius, spacing } from '@/constants/theme';
 import { useDistrict } from '@/context/DistrictContext';
 import { useFeed } from '@/hooks/useFeed';
 import type { FeedFilter, Post } from '@/types/post';
+import { formatTimeAgo } from '@/utils/format';
 
 // Defined outside the component so FlatList gets the same function every render.
 const keyExtractor = (post: Post) => post.id;
@@ -49,6 +51,20 @@ export default function FeedScreen() {
   );
 
   const districtName = t(`districts.${district}`);
+
+  // Offline: we're showing the saved snapshot. Refresh failed with no snapshot: keep
+  // the posts on screen but say they may be out of date.
+  let banner = null;
+  if (feed.isOffline && feed.savedAt) {
+    banner = (
+      <OfflineBanner
+        title={t('offline.title')}
+        message={t('offline.feedMessage', { time: formatTimeAgo(feed.savedAt, t) })}
+      />
+    );
+  } else if (feed.status === 'error' && feed.posts.length > 0) {
+    banner = <OfflineBanner title={t('offline.title')} message={t('offline.refreshFailed')} />;
+  }
 
   let content;
   if (feed.status === 'loading') {
@@ -93,6 +109,7 @@ export default function FeedScreen() {
         <DistrictPicker value={district} onChange={setDistrict} />
         <FilterTabs value={filter} onChange={setFilter} />
       </View>
+      {banner}
       {content}
       <Pressable
         onPress={openCreate}

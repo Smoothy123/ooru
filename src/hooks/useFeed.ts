@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 
 import { fetchPosts } from '@/api/posts';
+import { readFeedCache, saveFeedCache } from '@/cache/feedCache';
 import type { DistrictId } from '@/constants/districts';
 import type { FeedCursor, FeedFilter, FeedPage, Post } from '@/types/post';
 
@@ -19,11 +20,15 @@ export interface FeedState {
   status: FeedStatus;
   /** Loading the *next* page failed; the posts already shown stay. */
   loadMoreFailed: boolean;
+  /** The network failed and `posts` is the saved snapshot from `savedAt`. */
+  isOffline: boolean;
+  savedAt: string | null;
 }
 
 type FeedAction =
   | { type: 'request'; mode: LoadMode }
   | { type: 'success'; page: FeedPage; append: boolean }
+  | { type: 'offline'; posts: Post[]; savedAt: string }
   | { type: 'failure' }
   | { type: 'loadMoreFailure' };
 
@@ -32,6 +37,8 @@ export const initialFeedState: FeedState = {
   nextCursor: null,
   status: 'loading',
   loadMoreFailed: false,
+  isOffline: false,
+  savedAt: null,
 };
 
 // A reducer keeps every state transition in one pure, testable function
@@ -39,7 +46,7 @@ export const initialFeedState: FeedState = {
 export function feedReducer(state: FeedState, action: FeedAction): FeedState {
   switch (action.type) {
     case 'request':
-      if (action.mode === 'initial') return { ...initialFeedState, status: 'loading' };
+      if (action.mode === 'initial') return initialFeedState;
       if (action.mode === 'refresh') return { ...state, status: 'refreshing', loadMoreFailed: false };
       return { ...state, status: 'loadingMore', loadMoreFailed: false };
     case 'success':
@@ -48,6 +55,18 @@ export function feedReducer(state: FeedState, action: FeedAction): FeedState {
         nextCursor: action.page.nextCursor,
         status: 'idle',
         loadMoreFailed: false,
+        isOffline: false,
+        savedAt: null,
+      };
+    case 'offline':
+      // No cursor: we can't page further without the network.
+      return {
+        posts: action.posts,
+        nextCursor: null,
+        status: 'idle',
+        loadMoreFailed: false,
+        isOffline: true,
+        savedAt: action.savedAt,
       };
     case 'failure':
       return { ...state, status: 'error' };
@@ -56,6 +75,11 @@ export function feedReducer(state: FeedState, action: FeedAction): FeedState {
   }
 }
 
+/**
+ * Loads the feed for a district + filter with pagination, pull-to-refresh and an
+ * offline fallback. Strategy: network first; on success save page 1 to the cache;
+ * on failure show the last saved page 1 with an offline banner.
+ */
 export function useFeed(district: DistrictId, filter: FeedFilter) {
   const [state, dispatch] = useReducer(feedReducer, initialFeedState);
 
@@ -78,9 +102,16 @@ export function useFeed(district: DistrictId, filter: FeedFilter) {
         const page = await fetchPosts({ district, filter, cursor });
         if (!isLatest()) return;
         dispatch({ type: 'success', page, append: mode === 'more' });
+        if (mode !== 'more') saveFeedCache(district, filter, page.posts);
       } catch {
         if (!isLatest()) return;
-        dispatch(mode === 'more' ? { type: 'loadMoreFailure' } : { type: 'failure' });
+        if (mode === 'more') {
+          dispatch({ type: 'loadMoreFailure' });
+          return;
+        }
+        const cached = await readFeedCache(district, filter);
+        if (!isLatest()) return;
+        dispatch(cached ? { type: 'offline', posts: cached.posts, savedAt: cached.savedAt } : { type: 'failure' });
       } finally {
         if (isLatest()) isFetching.current = false;
       }

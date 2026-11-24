@@ -2,7 +2,9 @@
   "appName": "Ooru",
   "common": {
     "retry": "Try again",
-    "close": "Close"
+    "close": "Close",
+    "crashTitle": "Something went wrong",
+    "crashHint": "Please try again."
   },
   "districts": {
     "hyderabad": "Hyderabad",
@@ -94,5 +96,11 @@
   "language": {
     "switchTo": "తెలుగు",
     "switchA11y": "Switch app language to Telugu"
+  },
+  "offline": {
+    "title": "No connection",
+    "feedMessage": "Showing posts saved {{time}}. Pull down to try again.",
+    "refreshFailed": "Couldn't refresh. These posts may be out of date. Pull down to try again.",
+    "detailMessage": "Showing a saved copy of this post."
   }
 }
