@@ -17,7 +17,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.smoothy123.ooru"
+      "package": "com.smoothy123.ooru",
+      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW", "android.permission.VIBRATE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
