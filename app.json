@@ -33,6 +33,14 @@
           "cameraPermission": "Ooru uses the camera so you can take a photo for your ad.",
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0E7C66",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160
+        }
       ]
     ],
     "scheme": "ooru"

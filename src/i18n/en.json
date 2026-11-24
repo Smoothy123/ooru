@@ -90,5 +90,9 @@
     "nameTooShort": "Name must be at least {{nameMin}} characters.",
     "nameTooLong": "Name can be at most {{nameMax}} characters.",
     "photoTooLarge": "This photo is too large (max 5 MB). Try another one."
+  },
+  "language": {
+    "switchTo": "తెలుగు",
+    "switchA11y": "Switch app language to Telugu"
   }
 }
