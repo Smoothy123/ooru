@@ -10,10 +10,12 @@ import { AppText } from './AppText';
 interface Props {
   value: DistrictId;
   onChange: (district: DistrictId) => void;
+  /** Small text above the district name. Defaults to "Your district". */
+  caption?: string;
 }
 
 /** A button showing the current district; tapping it opens a simple list in a modal. */
-export function DistrictPicker({ value, onChange }: Props) {
+export function DistrictPicker({ value, onChange, caption }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const currentName = t(`districts.${value}`);
@@ -31,7 +33,7 @@ export function DistrictPicker({ value, onChange }: Props) {
         accessibilityLabel={t('districtPicker.a11yLabel', { district: currentName })}
         style={({ pressed }) => [styles.trigger, pressed && styles.pressed]}
       >
-        <AppText style={styles.caption}>{t('districtPicker.caption')}</AppText>
+        <AppText style={styles.caption}>{caption ?? t('districtPicker.caption')}</AppText>
         <AppText style={styles.current}>{currentName} ▾</AppText>
       </Pressable>
 

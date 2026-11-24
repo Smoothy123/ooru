@@ -12,7 +12,8 @@ import { colors, spacing } from '@/constants/theme';
 import type { Post } from '@/types/post';
 import { formatPrice, formatTimeAgo } from '@/utils/format';
 
-type DetailState = { status: 'loading' } | { status: 'notFound' } | { status: 'error' } | { status: 'ready'; post: Post };
+type DetailState =
+  { status: 'loading' } | { status: 'notFound' } | { status: 'error' } | { status: 'ready'; post: Post };
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -46,8 +47,10 @@ export default function PostDetailScreen() {
   };
 
   if (state.status === 'loading') return <LoadingState label={t('feed.loading')} />;
-  if (state.status === 'notFound') return <EmptyState title={t('detail.notFoundTitle')} hint={t('detail.notFoundHint')} />;
-  if (state.status === 'error') return <ErrorState title={t('detail.errorTitle')} hint={t('feed.errorHint')} onRetry={retry} />;
+  if (state.status === 'notFound')
+    return <EmptyState title={t('detail.notFoundTitle')} hint={t('detail.notFoundHint')} />;
+  if (state.status === 'error')
+    return <ErrorState title={t('detail.errorTitle')} hint={t('feed.errorHint')} onRetry={retry} />;
 
   const { post } = state;
   return (

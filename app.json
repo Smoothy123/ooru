@@ -25,7 +25,15 @@
     "plugins": [
       "expo-router",
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Ooru uses your photos so you can add one to your ad.",
+          "cameraPermission": "Ooru uses the camera so you can take a photo for your ad.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "scheme": "ooru"
   }

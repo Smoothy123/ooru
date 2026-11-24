@@ -2,9 +2,10 @@
 // functions and get plain `Post` objects back; they never see the database shape.
 import type { DistrictId } from '@/constants/districts';
 import { supabase } from '@/lib/supabase';
-import type { FeedCursor, FeedFilter, FeedPage, Post, PostType } from '@/types/post';
+import type { FeedCursor, FeedFilter, FeedPage, NewClassified, PickedPhoto, Post, PostType } from '@/types/post';
 
 export const PAGE_SIZE = 10;
+const IMAGE_BUCKET = 'post-images';
 
 const POST_COLUMNS = 'id, type, district, title, body, price, image_url, author_name, created_at';
 
@@ -93,4 +94,45 @@ export async function fetchPostById(id: string): Promise<Post | null> {
 
   if (error) throw new Error(error.message);
   return data ? toPost(data as PostRow) : null;
+}
+
+/**
+ * Uploads a picked photo to Supabase Storage and returns its public URL.
+ * fetch() can read a local file:// URI; we send the raw bytes, which is what
+ * Supabase recommends for React Native.
+ */
+export async function uploadPostImage(photo: PickedPhoto): Promise<string> {
+  const response = await fetch(photo.uri);
+  const bytes = await response.arrayBuffer();
+
+  const extension = photo.mimeType === 'image/png' ? 'png' : photo.mimeType === 'image/webp' ? 'webp' : 'jpg';
+  // A unique name, so two people uploading "photo.jpg" never collide.
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${extension}`;
+
+  const { error } = await supabase.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, bytes, { contentType: photo.mimeType, upsert: false });
+  if (error) throw new Error(error.message);
+
+  return supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+/** Inserts a classified and returns it as saved (with its server-generated id and time). */
+export async function createClassified(input: NewClassified): Promise<Post> {
+  const { data, error } = await supabase
+    .from('posts')
+    .insert({
+      type: 'classified',
+      district: input.district,
+      title: input.title,
+      body: input.body,
+      price: input.price,
+      image_url: input.imageUrl,
+      author_name: input.authorName,
+    })
+    .select(POST_COLUMNS)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return toPost(data as PostRow);
 }

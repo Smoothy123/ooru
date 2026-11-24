@@ -29,6 +29,24 @@ export interface FeedCursor {
   id: string;
 }
 
+/** A photo picked from the camera or gallery, before upload. */
+export interface PickedPhoto {
+  /** Local file:// URI on the device. */
+  uri: string;
+  mimeType: string;
+  fileSize?: number;
+}
+
+/** What the create screen sends to the API. The server fills in id and createdAt. */
+export interface NewClassified {
+  district: DistrictId;
+  title: string;
+  body: string;
+  price: number;
+  imageUrl: string | null;
+  authorName: string;
+}
+
 export interface FeedPage {
   posts: Post[];
   /** null means there are no more pages. */

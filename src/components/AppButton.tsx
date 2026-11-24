@@ -13,7 +13,14 @@ interface Props {
   accessibilityHint?: string;
 }
 
-export function AppButton({ title, onPress, variant = 'primary', disabled = false, loading = false, accessibilityHint }: Props) {
+export function AppButton({
+  title,
+  onPress,
+  variant = 'primary',
+  disabled = false,
+  loading = false,
+  accessibilityHint,
+}: Props) {
   const isPrimary = variant === 'primary';
   const isDisabled = disabled || loading;
 

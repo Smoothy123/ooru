@@ -22,6 +22,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: t('appName') }} />
         <Stack.Screen name="post/[id]" options={{ title: t('detail.title') }} />
+        <Stack.Screen name="create" options={{ title: t('create.title'), presentation: 'modal' }} />
       </Stack>
     </DistrictProvider>
   );
