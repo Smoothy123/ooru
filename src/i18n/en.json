@@ -1,0 +1,54 @@
+{
+  "appName": "Ooru",
+  "common": {
+    "retry": "Try again",
+    "close": "Close"
+  },
+  "districts": {
+    "hyderabad": "Hyderabad",
+    "vijayawada": "Vijayawada",
+    "visakhapatnam": "Visakhapatnam"
+  },
+  "districtPicker": {
+    "caption": "Your district",
+    "title": "Choose your district",
+    "a11yLabel": "District: {{district}}. Double tap to change."
+  },
+  "filters": {
+    "all": "All",
+    "news": "News",
+    "classified": "Classifieds"
+  },
+  "postType": {
+    "news": "News",
+    "classified": "Classified"
+  },
+  "feed": {
+    "loading": "Loading posts",
+    "loadingMore": "Loading more posts",
+    "emptyTitle": "Nothing here yet",
+    "emptyHint": "No posts in {{district}} for this filter. Pull down to refresh.",
+    "errorTitle": "Couldn't load posts",
+    "errorHint": "Check your internet connection and try again.",
+    "loadMoreError": "Couldn't load more posts.",
+    "postAd": "Post an ad"
+  },
+  "post": {
+    "free": "Free",
+    "postedBy": "Posted by {{name}}",
+    "openHint": "Opens the full post",
+    "photoOf": "Photo: {{title}}"
+  },
+  "detail": {
+    "title": "Post",
+    "notFoundTitle": "Post not found",
+    "notFoundHint": "It may have been removed.",
+    "errorTitle": "Couldn't load this post"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{n}} min ago",
+    "hoursAgo": "{{n}} h ago",
+    "daysAgo": "{{n}} d ago"
+  }
+}
