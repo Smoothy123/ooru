@@ -22,7 +22,7 @@ Built with React Native + Expo (Expo Router, TypeScript), Supabase (Postgres + S
 
 ## Screenshots
 
-Captured from the **v1.0.0 release APK** on an Android 16 emulator (Pixel 7), showing live data from Supabase.
+Captured from the **release APKs** (v1.0.0, and v1.0.1 for the post detail) on an Android 16 emulator (Pixel 7), showing live data from Supabase.
 
 <table>
   <tr>
