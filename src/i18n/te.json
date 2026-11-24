@@ -51,6 +51,7 @@
     "justNow": "ఇప్పుడే",
     "minutesAgo": "{{n}} నిమి. క్రితం",
     "hoursAgo": "{{n}} గం. క్రితం",
+    "oneDayAgo": "1 రోజు క్రితం",
     "daysAgo": "{{n}} రోజుల క్రితం"
   },
   "create": {

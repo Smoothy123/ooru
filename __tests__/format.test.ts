@@ -35,6 +35,13 @@ describe('formatTimeAgo', () => {
     expect(formatTimeAgo(ago(2 * 24 * 60 * 60 * 1000), t, now)).toBe('2 d ago');
   });
 
+  it('uses the singular for one day in Telugu', () => {
+    const te = i18n.getFixedT('te');
+    expect(formatTimeAgo(ago(26 * 60 * 60 * 1000), te, now)).toBe('1 రోజు క్రితం');
+    expect(formatTimeAgo(ago(2 * 24 * 60 * 60 * 1000), te, now)).toBe('2 రోజుల క్రితం');
+    expect(formatTimeAgo(ago(26 * 60 * 60 * 1000), t, now)).toBe('1 d ago');
+  });
+
   it('falls back to a date after 30 days', () => {
     expect(formatTimeAgo('2026-09-01T10:00:00Z', t, now)).toBe('1/9/2026');
   });

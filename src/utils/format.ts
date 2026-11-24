@@ -31,6 +31,9 @@ export function formatTimeAgo(isoDate: string, t: TFunction, now: number = Date.
   if (hours < 24) return t('time.hoursAgo', { n: hours });
 
   const days = Math.floor(hours / 24);
+  // Telugu uses a different word for one day (రోజు) than for several (రోజుల),
+  // so "1 day ago" has its own string instead of "{{n}} days ago".
+  if (days === 1) return t('time.oneDayAgo');
   if (days < 30) return t('time.daysAgo', { n: days });
 
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;

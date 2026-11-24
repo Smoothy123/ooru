@@ -51,6 +51,7 @@
     "justNow": "just now",
     "minutesAgo": "{{n}} min ago",
     "hoursAgo": "{{n}} h ago",
+    "oneDayAgo": "1 d ago",
     "daysAgo": "{{n}} d ago"
   },
   "create": {
