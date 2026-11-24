@@ -22,14 +22,26 @@ Built with React Native + Expo (Expo Router, TypeScript), Supabase (Postgres + S
 
 ## Screenshots
 
-<!-- Replace these placeholders: take screenshots on a phone (or `adb exec-out screencap -p > feed.png`),
-     put them in docs/screenshots/, and swap the cells below for ![Feed](docs/screenshots/feed.png). -->
+Captured from the **v1.0.0 release APK** on an Android 16 emulator (Pixel 7), showing live data from Supabase.
 
-|      Feed (English)      |      Feed (Telugu)       |       Post detail        |        Post an ad        |         Offline          |
-| :----------------------: | :----------------------: | :----------------------: | :----------------------: | :----------------------: |
-| _screenshot coming soon_ | _screenshot coming soon_ | _screenshot coming soon_ | _screenshot coming soon_ | _screenshot coming soon_ |
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/feed-en.png" width="240" alt="Hyderabad feed in English with news and classified cards, including Telugu posts"><br><sub>Feed in English</sub></td>
+    <td align="center"><img src="docs/screenshots/feed-te.png" width="240" alt="The same feed with the interface switched to Telugu"><br><sub>Same feed, Telugu UI</sub></td>
+    <td align="center"><img src="docs/screenshots/detail-te.png" width="240" alt="Detail screen of a Telugu classified ad for a 2BHK flat at ₹18,000"><br><sub>Post detail (Noto Sans Telugu)</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/district-picker.png" width="240" alt="District picker listing Hyderabad, Vijayawada and Visakhapatnam"><br><sub>District picker</sub></td>
+    <td align="center"><img src="docs/screenshots/create-validation.png" width="240" alt="Post an ad form showing red validation messages under each field"><br><sub>Post an ad, with validation</sub></td>
+    <td align="center"><img src="docs/screenshots/offline.png" width="240" alt="Visakhapatnam feed with a yellow No connection banner above saved posts"><br><sub>Offline: saved feed + banner</sub></td>
+  </tr>
+</table>
 
-**Demo GIF:** _coming soon_ (`docs/demo.gif`: switch language → change district → post an ad → go offline).
+### Demo
+
+<p align="center">
+  <img src="docs/demo.gif" width="280" alt="Demo: switching the app to Telugu, filtering to News, changing district to Vijayawada and opening a post">
+</p>
 
 ## Download the APK
 
@@ -213,6 +225,8 @@ npm run test:coverage
 | `api.test.ts`            | Query shape (page size + 1, cursor filter), snake_case → camelCase mapping, errors                                                                               |
 | `i18n.test.tsx`          | Telugu has every English key with the same `{{placeholders}}`, language choice persists, Telugu font selection                                                   |
 | `format.test.ts`         | Indian number grouping, relative time                                                                                                                            |
+
+**On a device:** the release APK was also checked on an Android 16 emulator against the live Supabase project. That covered Telugu rendering, the language switch, district switching, form validation, the keyboard leaving the focused field visible, and the offline banner.
 
 Only the network layer and the router are mocked in screen tests. Hooks, cache, context, components and translations run for real. To check that the tests actually catch bugs, I removed the stale-response guard, the double-fetch guard, the offline fallback, the price check and the district persistence one at a time. Each change made at least one test fail.
 
