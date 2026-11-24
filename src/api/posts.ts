@@ -12,10 +12,15 @@ const IMAGE_BUCKET = 'post-images';
 // to the offline cache. (Uploads get no timeout: big photos on 3G can be slow.)
 const READ_TIMEOUT_MS = 10_000;
 
-function timeoutSignal(ms: number): AbortSignal {
+/** Runs a query that is cancelled after READ_TIMEOUT_MS; the timer is cleared as soon as it settles. */
+async function withTimeout<T>(runQuery: (signal: AbortSignal) => PromiseLike<T>): Promise<T> {
   const controller = new AbortController();
-  setTimeout(() => controller.abort(), ms);
-  return controller.signal;
+  const timer = setTimeout(() => controller.abort(), READ_TIMEOUT_MS);
+  try {
+    return await runQuery(controller.signal);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 const POST_COLUMNS = 'id, type, district, title, body, price, image_url, author_name, created_at';
@@ -79,12 +84,14 @@ export async function fetchPosts({ district, filter, cursor = null }: FetchPosts
       .or(`created_at.lt."${cursor.createdAt}",and(created_at.eq."${cursor.createdAt}",id.lt."${cursor.id}")`);
   }
 
-  const { data, error } = await query
-    .order('created_at', { ascending: false })
-    .order('id', { ascending: false })
-    // Ask for one extra row: if it comes back, there is another page.
-    .limit(PAGE_SIZE + 1)
-    .abortSignal(timeoutSignal(READ_TIMEOUT_MS));
+  const { data, error } = await withTimeout((signal) =>
+    query
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      // Ask for one extra row: if it comes back, there is another page.
+      .limit(PAGE_SIZE + 1)
+      .abortSignal(signal),
+  );
 
   if (error) throw new Error(error.message);
 
@@ -102,12 +109,9 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 export async function fetchPostById(id: string): Promise<Post | null> {
   if (!UUID_PATTERN.test(id)) return null;
 
-  const { data, error } = await supabase
-    .from('posts')
-    .select(POST_COLUMNS)
-    .eq('id', id)
-    .abortSignal(timeoutSignal(READ_TIMEOUT_MS))
-    .maybeSingle();
+  const { data, error } = await withTimeout((signal) =>
+    supabase.from('posts').select(POST_COLUMNS).eq('id', id).abortSignal(signal).maybeSingle(),
+  );
 
   if (error) throw new Error(error.message);
   return data ? toPost(data as PostRow) : null;

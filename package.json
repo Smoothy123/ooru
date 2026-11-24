@@ -43,7 +43,8 @@
     "test": "jest",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:coverage": "jest --coverage"
   },
   "private": true,
   "jest": {
@@ -53,6 +54,12 @@
     ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
-    }
+    },
+    "collectCoverageFrom": [
+      "app/**/*.{ts,tsx}",
+      "src/**/*.{ts,tsx}",
+      "!src/mocks/**",
+      "!src/lib/**"
+    ]
   }
 }
