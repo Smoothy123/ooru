@@ -85,16 +85,18 @@ The APK is built in Expo's cloud, so you don't need Android Studio.
 ```bash
 npm install -g eas-cli
 eas login                    # free Expo account
-eas init                     # links the project (adds extra.eas.projectId to app.json)
+eas init                     # links the project (writes extra.eas.projectId and owner to app.json)
 
 # .env is never uploaded, so give the build its values as EAS environment variables:
-eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://<ref>.supabase.co" --visibility sensitive
-eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<anon-key>" --visibility sensitive
+eas env:set --environment preview --environment production --name EXPO_PUBLIC_SUPABASE_URL --value "https://<ref>.supabase.co" --visibility sensitive
+eas env:set --environment preview --environment production --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<anon-key>" --visibility sensitive
 
 eas build --platform android --profile preview
 ```
 
 The `preview` profile in [`eas.json`](eas.json) produces an installable `.apk`; `production` produces an `.aab` for the Play Store.
+
+If you fork this repo, delete `owner` and `extra.eas.projectId` from `app.json` first: they point to the original author's Expo project. `eas init` then links your own.
 
 ---
 

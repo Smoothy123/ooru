@@ -44,6 +44,12 @@
         }
       ]
     ],
-    "scheme": "ooru"
+    "scheme": "ooru",
+    "extra": {
+      "eas": {
+        "projectId": "88733af5-2e0b-4342-bdd1-79cc598a0310"
+      }
+    },
+    "owner": "smoothy123"
   }
 }
